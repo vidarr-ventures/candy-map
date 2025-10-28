@@ -10,146 +10,70 @@
         margin: 0;
         padding: 0;
       }
-      #header {
-        background-color: #ff6600;
-        color: #fff;
-        text-align: center;
-        font-family: Arial, sans-serif;
-        font-size: 20px;
-        font-weight: bold;
-        padding: 10px;
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 10;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      }
-      #refresh-btn {
-        background-color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 6px 12px;
-        font-size: 14px;
-        cursor: pointer;
-        margin-left: 10px;
-      }
       #map {
         height: 100%;
         width: 100%;
-        position: absolute;
-        top: 50px;
-        left: 0;
       }
-      .gm-style-iw p { margin: 0; }
-
-      /* Legend box */
-      #legend {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 10px 14px;
-        border-radius: 8px;
+      #header {
+        background: #ff6600;
+        color: white;
+        text-align: center;
         font-family: Arial, sans-serif;
-        font-size: 14px;
+        font-weight: bold;
+        padding: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        z-index: 1000;
         position: fixed;
-        bottom: 20px;
-        right: 20px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        z-index: 20;
-      }
-      #legend h3 {
-        margin: 0 0 6px 0;
-        font-size: 14px;
-        color: #333;
-      }
-      .legend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 4px;
-      }
-      .legend-color {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        margin-right: 8px;
-        border: 1px solid #333;
+        width: 100%;
       }
     </style>
 
+    <!-- Use your restricted API key here -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCo55WIobOFczEhfRbrzI5jCGXLA0A9yWk"></script>
 
     <script>
       let map;
+      let kmlLayer;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 42.529, lng: -71.35 },
+          center: { lat: 42.529, lng: -71.35 }, // Carlisle, MA
           zoom: 14,
           mapTypeId: "roadmap",
         });
 
-        loadKML();
+        loadKML(); // initial load
+        setInterval(refreshKML, 5 * 60 * 1000); // refresh every 5 minutes
       }
 
+      // Load the KML file with a cache-busting parameter
       function loadKML() {
-        const kmlUrl = "https://raw.githubusercontent.com/vidarr-ventures/candy-map/main/CandyMap.kml?v=" + new Date().getTime();
+        const kmlUrl =
+          "https://raw.githubusercontent.com/vidarr-ventures/candy-map/main/CandyMap.kml?v=" +
+          new Date().getTime();
 
-        fetch(kmlUrl)
-          .then((res) => res.text())
-          .then((kmlText) => {
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(kmlText, "text/xml");
-            const placemarks = xml.getElementsByTagName("Placemark");
+        if (kmlLayer) {
+          kmlLayer.setMap(null);
+        }
 
-            for (let i = 0; i < placemarks.length; i++) {
-              const name = placemarks[i].getElementsByTagName("name")[0]?.textContent || "";
-              const coordsText = placemarks[i].getElementsByTagName("coordinates")[0]?.textContent || "";
-              if (!coordsText) continue;
+        kmlLayer = new google.maps.KmlLayer({
+          url: kmlUrl,
+          map: map,
+          preserveViewport: true,
+          suppressInfoWindows: false,
+        });
 
-              const [lng, lat] = coordsText.trim().split(",").map(Number);
-              const candyMatch = name.match(/(\d{2,5})\s*pieces/i);
-              const candyCount = candyMatch ? parseInt(candyMatch[1]) : 0;
-
-              // Exact color mapping
-              let color;
-              switch (candyCount) {
-                case 200: color = "#2ecc71"; break;   // green
-                case 500: color = "#3498db"; break;   // blue
-                case 750: color = "#f39c12"; break;   // orange
-                case 1000: color = "#9b59b6"; break;  // purple
-                case 1500: color = "#e74c3c"; break;  // red
-                case 2000: color = "#c0392b"; break;  // dark red
-                default: color = "#95a5a6";           // gray
-              }
-
-              const marker = new google.maps.Marker({
-                position: { lat, lng },
-                map,
-                title: name,
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  fillColor: color,
-                  fillOpacity: 0.9,
-                  strokeWeight: 1,
-                  strokeColor: "#333",
-                  scale: 7,
-                },
-              });
-
-              const infoWindow = new google.maps.InfoWindow({
-                content: `<strong>${name}</strong>`,
-              });
-
-              marker.addListener("click", () => infoWindow.open(map, marker));
-            }
-          })
-          .catch((err) => {
-            alert("⚠️ Could not load KML file. Make sure it is shared publicly.");
-            console.error(err);
-          });
+        kmlLayer.addListener("status_changed", () => {
+          if (kmlLayer.getStatus() !== "OK") {
+            console.warn("Could not load KML data. Ensure the file is public.");
+          }
+        });
       }
 
-      function refreshMap() {
-        document.getElementById("map").innerHTML = "";
-        initMap();
+      // Explicit refresh wrapper (reloads KML only)
+      function refreshKML() {
+        console.log("Refreshing candy map KML...");
+        loadKML();
       }
 
       window.onload = initMap;
@@ -157,22 +81,7 @@
   </head>
 
   <body>
-    <div id="header">
-      🎃 Carlisle Halloween Candy Map
-      <button id="refresh-btn" onclick="refreshMap()">Refresh Map</button>
-    </div>
+    <div id="header">🎃 Carlisle Halloween Candy Map — auto-refreshes every 5 minutes</div>
     <div id="map"></div>
-
-    <!-- Legend -->
-    <div id="legend">
-      <h3>Candy Colors</h3>
-      <div class="legend-item"><div class="legend-color" style="background:#2ecc71;"></div>200 pieces</div>
-      <div class="legend-item"><div class="legend-color" style="background:#3498db;"></div>500 pieces</div>
-      <div class="legend-item"><div class="legend-color" style="background:#f39c12;"></div>750 pieces</div>
-      <div class="legend-item"><div class="legend-color" style="background:#9b59b6;"></div>1000 pieces</div>
-      <div class="legend-item"><div class="legend-color" style="background:#e74c3c;"></div>1500 pieces</div>
-      <div class="legend-item"><div class="legend-color" style="background:#c0392b;"></div>2000 pieces</div>
-      <div class="legend-item"><div class="legend-color" style="background:#95a5a6;"></div>Other</div>
-    </div>
   </body>
 </html>
