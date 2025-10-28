@@ -47,7 +47,6 @@
 
     <script>
       let map;
-      let kmlLayer;
 
       function initMap() {
         // Center on Carlisle, MA
@@ -61,35 +60,70 @@
       }
 
       function loadKML() {
+        // Your same Drive-hosted KML file
         const kmlUrl = "https://drive.google.com/uc?export=download&id=17uU8PbDkT_S0sYOHvdY3EHxWP9l-YLGK";
 
-        // Remove any existing KML layer first
-        if (kmlLayer) {
-          kmlLayer.setMap(null);
-        }
+        fetch(kmlUrl)
+          .then((res) => res.text())
+          .then((kmlText) => {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(kmlText, "text/xml");
+            const placemarks = xml.getElementsByTagName("Placemark");
 
-        kmlLayer = new google.maps.KmlLayer({
-          url: kmlUrl,
-          map: map,
-          preserveViewport: false,
-          suppressInfoWindows: false,
-        });
+            for (let i = 0; i < placemarks.length; i++) {
+              const name = placemarks[i].getElementsByTagName("name")[0]?.textContent || "";
+              const coordsText = placemarks[i].getElementsByTagName("coordinates")[0]?.textContent || "";
+              if (!coordsText) continue;
 
-        kmlLayer.addListener("status_changed", () => {
-          const status = kmlLayer.getStatus();
-          if (status !== "OK") {
-            alert("⚠️ Could not load map data. Make sure the KML file is shared publicly.");
-          }
-        });
+              const [lng, lat] = coordsText.trim().split(",").map(Number);
+
+              // Extract candy count from name (e.g. "5 Lowell Street — 1500 pieces")
+              const candyMatch = name.match(/(\d{2,5})\s*pieces/i);
+              const candyCount = candyMatch ? parseInt(candyMatch[1]) : 0;
+
+              // Choose marker color
+              let color = "green";
+              if (candyCount >= 1000) color = "red";
+              else if (candyCount >= 750) color = "orange";
+
+              const marker = new google.maps.Marker({
+                position: { lat, lng },
+                map,
+                title: name,
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  fillColor: color,
+                  fillOpacity: 0.9,
+                  strokeWeight: 1,
+                  strokeColor: "#333",
+                  scale: 7,
+                },
+              });
+
+              const infoWindow = new google.maps.InfoWindow({
+                content: `<strong>${name}</strong>`,
+              });
+
+              marker.addListener("click", () => {
+                infoWindow.open(map, marker);
+              });
+            }
+          })
+          .catch((err) => {
+            alert("⚠️ Could not load KML file. Make sure it is shared publicly.");
+            console.error(err);
+          });
       }
 
       function refreshMap() {
-        loadKML();
+        document.getElementById("map").innerHTML = "";
+        initMap();
       }
 
       window.onload = initMap;
     </script>
   </head>
+
   <body>
     <div id="header">
       🎃 Carlisle Halloween Candy Map
