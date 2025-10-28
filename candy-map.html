@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    span.s1 {font: 20.0px 'Helvetica Neue'}
+    span.s2 {font: 13.0px 'Helvetica Neue'}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Carlisle Halloween Candy Map&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>html, body { height: 100%; margin: 0; padding: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>#map { height: 100%; width: 100%; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>.gm-style-iw p { margin: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://maps.googleapis.com/maps/api/js?key=<span class="s1"><b>AIzaSyCkVmW-fM7yR9iVgoEZU8Kyhw54LeioIi0</b></span>"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>async function initMap() {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Center on Carlisle, MA</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const map = new google.maps.Map(document.getElementById("map"), {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>center: { lat: 42.529, lng: -71.35 },</p>
+<p class="p1"><span class="Apple-converted-space">          </span>zoom: 14,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>mapTypeId: "roadmap",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// URL of your public KML file in Google Drive</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const kmlUrl = "https://drive.google.com/uc?export=download&amp;id=<span class="s2">17uU8PbDkT_S0sYOHvdY3EHxWP9l-YLGK</span>";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Load the KML layer</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const kmlLayer = new google.maps.KmlLayer({</p>
+<p class="p1"><span class="Apple-converted-space">          </span>url: kmlUrl,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>map: map,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>preserveViewport: false,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>suppressInfoWindows: false,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>kmlLayer.addListener("status_changed", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (kmlLayer.getStatus() !== "OK") {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>alert("Could not load map data. Make sure the KML file is shared publicly.");</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>window.onload = initMap;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="map"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
