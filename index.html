@@ -47,28 +47,27 @@
       }
 
       // Load the KML file with a cache-busting parameter
-      function loadKML() {
-        const kmlUrl =
-          "https://raw.githubusercontent.com/vidarr-ventures/candy-map/main/CandyMap.kml?v=" +
-          new Date().getTime();
+     function loadKML() {
+  const kmlUrl =
+    "https://drive.google.com/uc?export=download&id=17uU8PbDkT_S0sYOHvdY3EHxWP9l-YLGK&v=" + new Date().getTime();
 
-        if (kmlLayer) {
-          kmlLayer.setMap(null);
-        }
+  if (kmlLayer) {
+    kmlLayer.setMap(null);
+  }
 
-        kmlLayer = new google.maps.KmlLayer({
-          url: kmlUrl,
-          map: map,
-          preserveViewport: true,
-          suppressInfoWindows: false,
-        });
+  kmlLayer = new google.maps.KmlLayer({
+    url: kmlUrl,
+    map: map,
+    preserveViewport: true,
+    suppressInfoWindows: false,
+  });
 
-        kmlLayer.addListener("status_changed", () => {
-          if (kmlLayer.getStatus() !== "OK") {
-            console.warn("Could not load KML data. Ensure the file is public.");
-          }
-        });
-      }
+  kmlLayer.addListener("status_changed", () => {
+    if (kmlLayer.getStatus() !== "OK") {
+      console.warn("Could not load KML data. Ensure the file is public.");
+    }
+  });
+}
 
       // Explicit refresh wrapper (reloads KML only)
       function refreshKML() {
