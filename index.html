@@ -90,7 +90,7 @@
       }
 
       function loadKML() {
-        const kmlUrl = "https://raw.githubusercontent.com/vidarr-ventures/candy-map/main/CandyMap.kml";
+        const kmlUrl = "https://raw.githubusercontent.com/vidarr-ventures/candy-map/main/CandyMap.kml?v=" + new Date().getTime();
 
         fetch(kmlUrl)
           .then((res) => res.text())
