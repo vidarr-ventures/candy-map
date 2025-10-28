@@ -22,7 +22,7 @@
         top: 0;
         width: 100%;
         z-index: 10;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       }
       #refresh-btn {
         background-color: #fff;
@@ -49,7 +49,6 @@
       let map;
 
       function initMap() {
-        // Center on Carlisle, MA
         map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 42.529, lng: -71.35 },
           zoom: 14,
@@ -60,9 +59,7 @@
       }
 
       function loadKML() {
-        // Your same Drive-hosted KML file
         const kmlUrl = "https://raw.githubusercontent.com/vidarr-ventures/candy-map/main/CandyMap.kml";
-
 
         fetch(kmlUrl)
           .then((res) => res.text())
@@ -78,14 +75,21 @@
 
               const [lng, lat] = coordsText.trim().split(",").map(Number);
 
-              // Extract candy count from name (e.g. "5 Lowell Street — 1500 pieces")
+              // Extract candy count (e.g. "1500 pieces")
               const candyMatch = name.match(/(\d{2,5})\s*pieces/i);
               const candyCount = candyMatch ? parseInt(candyMatch[1]) : 0;
 
-              // Choose marker color
-              let color = "green";
-              if (candyCount >= 1000) color = "red";
-              else if (candyCount >= 750) color = "orange";
+              // Define color by exact number
+              let color;
+              switch (candyCount) {
+                case 200: color = "#2ecc71"; break;    // green
+                case 500: color = "#3498db"; break;    // blue
+                case 750: color = "#f39c12"; break;    // orange
+                case 1000: color = "#9b59b6"; break;   // purple
+                case 1500: color = "#e74c3c"; break;   // red
+                case 2000: color = "#c0392b"; break;   // dark red
+                default: color = "#95a5a6";            // gray fallback
+              }
 
               const marker = new google.maps.Marker({
                 position: { lat, lng },
